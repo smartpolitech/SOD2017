@@ -75,7 +75,7 @@ class Main():
 		datos = datos[:-1]
 		cabecerahttp = "http://" + influxIP + ":8086/write?db=" + influxDB
 		print "curl -i -POST " + cabecerahttp + "-u admin:alwayssmarter --data-binary " + datos
-		print call(["curl", "-i", "-POST", cabecerahttp, "-u", "admin:alwayssmarter", "--data-binary", datos])
+		#print call(["curl", "-i", "-POST", cabecerahttp, "-u", "admin:alwayssmarter", "--data-binary", datos])
 
 if __name__ == '__main__':
 	app = QCoreApplication(sys.argv)
