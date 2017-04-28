@@ -30,7 +30,7 @@ cadenaMedidas, err = process.communicate()
 periodo = param3
 
 medidas = json.loads(cadenaMedidas)
-pp.pprint(medidas)
+#pp.pprint(medidas)
 cursor = medidas['results'][0]['series'][0]['values']
 
 for medida in cursor:
@@ -38,8 +38,12 @@ for medida in cursor:
     dia = fecha.weekday()
     hora = fecha.hour
     minuto = fecha.minute
-    minutoMasCercano = int((round(minuto/float(periodo))*periodo)%60)
-    
+    #minutoMasCercano = int((round(minuto/float(periodo))*periodo)%60)
+
+    if medida[2] > 2:
+        print "ALARMA at ", fecha
+
+
 
 
     
