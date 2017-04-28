@@ -2,7 +2,7 @@
 module GoogleCalendar{
 
   interface GoogleCalendarI{
-      bool checkEvent(string time);
+      bool checkEvent(string date);
   }
 
 }
