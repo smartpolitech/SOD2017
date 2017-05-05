@@ -22,10 +22,10 @@ param3 = args.periodo
 
 pp = pprint.PrettyPrinter(indent=4)
 
-for archivo in os.listdir("models"):
+for archivo in os.listdir("../../models"):
     (nombreFichero, extension) = os.path.splitext(archivo)
     if(extension == ".pickle") and (nombreFichero.startswith(param1)):
-        modelo = pickle.load(open('models/'+archivo, 'r'))
+        modelo = pickle.load(open('../../models/'+archivo, 'r'))
 
 curlCommand = "curl -G 'http://10.253.247.18:8086/query?pretty=true' -u guest:smartpolitech --data-urlencode \"db=sensors\" --data-urlencode \"q=select * from " + param1 + " where time > now() - " + param2 + "d\""
 args = shlex.split(curlCommand)
@@ -49,5 +49,3 @@ for medida in cursor:
     varianza = modelo[dia][hora][minutoMasCercano]['variance']
     if (medida[1]>(media+varianza)):
         print "Anomalía detectada el "+str(fecha)+".\t\tMedida tomada = "+str(medida[1])+".\tMedia = "+str(round(media,3))+".\t\tVarianza = "+str(round(varianza,3))
-    
-

@@ -12,9 +12,10 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+compensacionGMT = 2
 
 def gaussian(x):
-    horaPico = 13
+    horaPico = 13 - compensacionGMT
     mu = [horaPico*6+y for y in range(0, 1008, 144)]
     sig = 10.0
     return      np.exp(-np.power(x - mu[0], 2.0) / (2 * np.power(sig, 2.0)))    \
@@ -28,15 +29,15 @@ def gaussian(x):
 def getMeasuresOfAWeek(w):
     fecha = dt.datetime.now()
     diasSemana = fecha.weekday()
-        
+    
     if w == 0:
         minutosDesde = fecha.minute + fecha.hour*60 + diasSemana*24*60
         curlCommand = "curl -G 'http://10.253.247.18:8086/query?pretty=true' -u guest:smartpolitech --data-urlencode \"db=sensors\" --data-urlencode \"q=select * from " + param1 + " where time > now() - " + str(minutosDesde) + "m\""
     else:
         minutosDesde = fecha.minute + fecha.hour*60 + diasSemana*24*60 + (w-1)*7*24*60
         minutosHasta = minutosDesde + 60*24*7
-        curlCommand = "curl -G 'http://10.253.247.18:8086/query?pretty=true' -u guest:smartpolitech --data-urlencode \"db=sensors\" --data-urlencode \"q=select * from " + param1 + " where time < now() - " + str(minutosDesde) + "m and time > now() - " + str(minutosHasta) + "m\""    
-        
+        curlCommand = "curl -G 'http://10.253.247.18:8086/query?pretty=true' -u guest:smartpolitech --data-urlencode \"db=sensors\" --data-urlencode \"q=select * from " + param1 + " where time < now() - " + str(minutosDesde) + "m and time > now() - " + str(minutosHasta) + "m\""
+            
     return curlCommand
 
 argumentsParser = argparse.ArgumentParser()
@@ -53,10 +54,10 @@ param4 = args.semana
 
 pp = pprint.PrettyPrinter(indent=4)
 
-for archivo in os.listdir("models"):
+for archivo in os.listdir("../../models"):
     (nombreFichero, extension) = os.path.splitext(archivo)
     if(extension == ".pickle") and (nombreFichero.startswith(param1)):
-        modelo = pickle.load(open('models/'+archivo, 'r'))
+        modelo = pickle.load(open('../../models/'+archivo, 'r'))
 
 args = shlex.split(getMeasuresOfAWeek(param4))
 
@@ -68,7 +69,14 @@ periodo = param3
 medidas = json.loads(cadenaMedidas)
 cursor = medidas['results'][0]['series'][0]['values']
 
-medias = []
+semana = dict()
+for d in range(0,7):
+    semana[d] = dict()
+    for h in range(0,24):
+        semana[d][h] = dict()
+        for m in range(0,60,periodo):
+            semana[d][h][m] = {"valor": 0.0}
+
 for medida in cursor:
     fecha = parser.parse(medida[0])
     dia = fecha.weekday()
@@ -76,14 +84,18 @@ for medida in cursor:
     minuto = fecha.minute
     minutoMasCercano = int((round(minuto/float(periodo))*periodo)%60)
     
-    media = modelo[dia][hora][minutoMasCercano]['average']
-    
-    medias.append(media)
+    semana[dia][hora][minutoMasCercano]['valor'] = medida[1]
 
-xList = range(len(medias))
+valores = []
+for d in range(0,7):
+    for h in range(0,24):
+        for m in range(0,60,periodo):
+            valores.append(semana[d][h][m]['valor'])
+
+xList = range(len(valores))
 gaussianFunction = [gaussian(x) for x in xList]
 
 plt.plot(xList, gaussianFunction)
-plt.plot(xList, medias)
-plt.axis([0, 1008, 0, max(medias)*1.5])
+plt.plot(xList, valores)
+plt.axis([0, len(valores), 0, max(valores)*1.5])
 plt.show()

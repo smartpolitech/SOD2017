@@ -8,6 +8,8 @@ import ConfigParser
 import shlex
 import pickle
 import argparse
+import matplotlib.pyplot as plt
+
 
 argumentsParser = argparse.ArgumentParser()
 argumentsParser.add_argument("--tabla", type=str, help='nombre de la tabla en la base de datos', default="UEXCC_TEL_P00_CUA027_SEN001_AGU", required=False)
@@ -59,4 +61,17 @@ for medida in cursor:
     
 pp.pprint(semana)
 
-pickle.dump(semana, open(param1+"_"+str(dt.datetime.today().strftime("%Y-%m-%d"))+".pickle", 'w'))
+pickle.dump(semana, open("models/"+param1+"_"+str(dt.datetime.today().strftime("%Y-%m-%d"))+".pickle", 'w'))
+
+
+
+medidas = []
+for d in range(0,7):
+    for h in range(0,24):
+        for m in range(0,60,periodo):
+            medidas.append(semana[d][h][m]['average'])
+
+
+plt.plot(medidas)
+plt.axis([0, 1008, 0, 4])
+plt.show()
