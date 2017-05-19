@@ -1,11 +1,11 @@
 module ModuleNotification{
 
 	interface GmailI{
-		void sendMail(string date);
+		void sendMail(string msg);
 	};
 
 	interface TelegramI{
-		void sendMsg(string date);
+		void sendMsg(string msg);
 	};
 
 
