@@ -10,6 +10,7 @@ import pickle
 import argparse
 import matplotlib.pyplot as plt
 
+compensacionGMT = 0
 
 argumentsParser = argparse.ArgumentParser()
 argumentsParser.add_argument("--tabla", type=str, help='nombre de la tabla en la base de datos', default="UEXCC_TEL_P00_CUA027_SEN001_AGU", required=False)
@@ -47,23 +48,23 @@ for medida in cursor:
     hora = fecha.hour
     minuto = fecha.minute
     minutoMasCercano = int((round(minuto/float(periodo))*periodo)%60)
-    #print dia, hora, minuto, minutoMasCercano
-    
-    semana[dia][hora][minutoMasCercano]['total'] += medida[1]
-    
-    semana[dia][hora][minutoMasCercano]['count'] += 1
-    
-    contador = semana[dia][hora][minutoMasCercano]['count']
-    mediaAnterior = semana[dia][hora][minutoMasCercano]['average']
-    semana[dia][hora][minutoMasCercano]['average'] += (medida[1] - mediaAnterior)/contador
-    
-    semana[dia][hora][minutoMasCercano]['variance'] += (medida[1] - mediaAnterior) * (medida[1] - semana[dia][hora][minutoMasCercano]['average'])
+
+    if (hora-compensacionGMT >= 8 and hora-compensacionGMT <= 21) and (dia <= 4):
+        #print dia, hora, minuto, minutoMasCercano
+        
+        semana[dia][hora][minutoMasCercano]['total'] += medida[1]
+        
+        semana[dia][hora][minutoMasCercano]['count'] += 1
+        
+        contador = semana[dia][hora][minutoMasCercano]['count']
+        mediaAnterior = semana[dia][hora][minutoMasCercano]['average']
+        semana[dia][hora][minutoMasCercano]['average'] += (medida[1] - mediaAnterior)/contador
+        
+        semana[dia][hora][minutoMasCercano]['variance'] += (medida[1] - mediaAnterior) * (medida[1] - semana[dia][hora][minutoMasCercano]['average'])
     
 pp.pprint(semana)
 
 pickle.dump(semana, open("models/"+param1+"_"+str(dt.datetime.today().strftime("%Y-%m-%d"))+".pickle", 'w'))
-
-
 
 medidas = []
 for d in range(0,7):
@@ -73,5 +74,5 @@ for d in range(0,7):
 
 
 plt.plot(medidas)
-plt.axis([0, 1008, 0, 4])
+plt.axis([0, len(medidas), 0, 4])
 plt.show()
