@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps
 
-compensacionGMT = 2
+compensacionGMT = 0
 
 def checkZero(anclajesY):
     for i in anclajesY:
@@ -21,37 +21,56 @@ def checkZero(anclajesY):
             return True
     return False
 
-def calculateBox(semana, dia):
+def fitnessSimpson(anclajesY, anclajesX, medidas):
 
-    anclajesX = [(8-compensacionGMT)*60/periodo,
-                 (11-compensacionGMT)*60/periodo,
-                 (13-compensacionGMT)*60/periodo,
-                 (15-compensacionGMT)*60/periodo,
-                 (17-compensacionGMT)*60/periodo,
-                 (19-compensacionGMT)*60/periodo,
-                 (22-compensacionGMT)*60/periodo]
+    l1 = simps(anclajesY, x=anclajesX)
+    l2 = simps(medidas, dx=1)
+    le = abs(l1-l2)
+
+    return le
+
+def calculateBox(modelo, dia):
+
+    anclajesX = [(8-compensacionGMT)*60/periodo, #(8-compensacionGMT)*60/periodo + 30/periodo,
+                 #(9-compensacionGMT)*60/periodo, #(9-compensacionGMT)*60/periodo + 30/periodo,
+                 (10-compensacionGMT)*60/periodo, #(10-compensacionGMT)*60/periodo + 30/periodo,
+                 #(11-compensacionGMT)*60/periodo, #(11-compensacionGMT)*60/periodo + 30/periodo,
+                 (12-compensacionGMT)*60/periodo, #(12-compensacionGMT)*60/periodo + 30/periodo,
+                 #(13-compensacionGMT)*60/periodo, #(13-compensacionGMT)*60/periodo + 30/periodo,
+                 (14-compensacionGMT)*60/periodo, #(14-compensacionGMT)*60/periodo + 30/periodo,
+                 #(15-compensacionGMT)*60/periodo, #(15-compensacionGMT)*60/periodo + 30/periodo,
+                 (16-compensacionGMT)*60/periodo, #(16-compensacionGMT)*60/periodo + 30/periodo,
+                 #(17-compensacionGMT)*60/periodo, #(17-compensacionGMT)*60/periodo + 30/periodo,
+                 (18-compensacionGMT)*60/periodo, #(18-compensacionGMT)*60/periodo + 30/periodo,
+                 #(19-compensacionGMT)*60/periodo, #(19-compensacionGMT)*60/periodo + 30/periodo,
+                 (20-compensacionGMT)*60/periodo, #(20-compensacionGMT)*60/periodo + 30/periodo,
+                 #(21-compensacionGMT)*60/periodo, #(21-compensacionGMT)*60/periodo + 30/periodo,
+                 (22-compensacionGMT)*60/periodo] #(22-compensacionGMT)*60/periodo + 30/periodo]
     medidas = []
     for h in range(0,24):
         for m in range(0,60,periodo):
-            medidas.append(semana[dia][h][m]['valor'])
+            medidas.append(modelo[dia][h][m]['average'])
         
     leAnt = 10000
     solucion = []
     for i in range(0,10000):
-        anclajesY = np.random.randint(0, 3, size=len(anclajesX))
+        anclajesY = np.random.uniform(0, 3, size=len(anclajesX))
         
-        l1 = simps(anclajesY, x=anclajesX)
-        l2 = simps(medidas, dx=1)
-        
-        le = abs(l1-l2)
+        #metodo que calcule el fitness
+        le = fitnessSimpson(anclajesY, anclajesX, medidas)
                 
         if le < leAnt and not checkZero(anclajesY):
             leAnt = le
             solucion = anclajesY
             print le, solucion
+        elif le < 1.0:
+            break
+        elif np.random.randint(0, 100, 1) < np.int(5):
+            leAnt = le
         
     plt.plot(anclajesX, solucion)
     plt.plot(range(0, 24*60/periodo), medidas)
+    plt.axis([0, 24*60/periodo, 0, 5])
     plt.show()
 
 
@@ -160,11 +179,11 @@ for d in range(0,5):
     puntos.append([calcX(d,21-compensacionGMT,0), 0.7])
     puntos.append([calcX(d,22-compensacionGMT,0), 0])
 
-boxFunction = [box(x, puntos) for x in xList]
+#for dia in range(0,7):
+calculateBox(modelo, param5)
 
-#calculateBox(semana, param5)
-
-plt.plot(xList, boxFunction)
-plt.plot(xList, valores)
-plt.axis([0, len(valores), 0, max(valores)*1.5])
-plt.show()
+#boxFunction = [box(x, puntos) for x in xList]
+#plt.plot(xList, boxFunction)
+#plt.plot(xList, valores)
+#plt.axis([0, len(valores), 0, max(valores)*1.5])
+#plt.show()
