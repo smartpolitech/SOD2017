@@ -118,16 +118,15 @@ def calculateBox(modelo, dia):
                  #(21-compensacionGMT)*60/periodo, #(21-compensacionGMT)*60/periodo + 30/periodo,
                  (22-compensacionGMT)*60/periodo] #(22-compensacionGMT)*60/periodo + 30/periodo]
     medidas = []
-<<<<<<< HEAD
+
     for d in range(0,7):
         for h in range(0,24):
             for m in range(0,60,periodo):
                 medidas.append(modelo[d][h][m]['average'])
-=======
+
     for h in range(0,24):
         for m in range(0,60,periodo):
             medidas.append(modelo[dia][h][m]['average'])
->>>>>>> c1db66e13b9fd6b3937050b27d1d5adaf6ac0b7a
         
     leAnt = 10000
     # solucion = []
@@ -146,7 +145,6 @@ def calculateBox(modelo, dia):
     #     elif np.random.randint(0, 100, 1) < np.int(5):
     #         leAnt = le
         
-<<<<<<< HEAD
     # SMOOTHING por le método de Savitzky-Golay
     med = np.array(medidas)
     smooth = savitzky_golay(med, 51, 3)
@@ -155,13 +153,12 @@ def calculateBox(modelo, dia):
 
     plt.plot(range(0, 7*24*60/periodo), smooth)
     plt.plot(range(0, 7*24*60/periodo), medidas)
-=======
+
     med = np.array(medidas)
     smooth = savitzky_golay(med, 51, 3)
     plt.plot(range(0, 24*60/periodo),smooth)
     plt.plot(range(0, 24*60/periodo),medidas)
-    #pltperiodo),medidas/periodo, 0, 5])
->>>>>>> c1db66e13b9fd6b3937050b27d1d5adaf6ac0b7a
+
     plt.show()
 
   # SMOOTHING por le método de Ramer-Douglas-Peucker algorithm
@@ -282,8 +279,5 @@ calculateBox(modelo, param5)
 #plt.plot(xList, boxFunction)
 #plt.plot(xList, valores)
 #plt.axis([0, len(valores), 0, max(valores)*1.5])
-<<<<<<< HEAD
 #plt.show()
-=======
 #plt.show()
->>>>>>> c1db66e13b9fd6b3937050b27d1d5adaf6ac0b7a
